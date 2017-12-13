@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
+from wtforms import Form, StringField, IntegerField, FloatField
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/candy'
@@ -29,10 +30,41 @@ class Candy(db.Model):
         } for candy in Candy.query.all()]
 
 
+class CandyForm(Form):
+    competitorname = StringField('Name')
+    chocolate = IntegerField('chocolate')
+    fruity = IntegerField('fruity')
+    caramel = IntegerField('caramel')
+    peanutyalmondy = IntegerField('peanutyalmondy')
+    nougat = IntegerField('nougat')
+    crispedricewafer = IntegerField('crispedricewafer')
+    hard = IntegerField('hard')
+    bar = IntegerField('bar')
+    pluribus = IntegerField('pluribus')
+    sugarpercent = FloatField('sugar percent') 
+    pricepercent = FloatField('price percent')
+    winpercent = FloatField('win percent')
+
+
 @app.route('/')
 def show_candies():
     candies = Candy.query.all()
     return render_template('candy_list.html', candies=candies, candy_json=Candy.display_json())
+
+
+@app.route('/create', methods=['GET', 'POST'])
+def create_candies():
+    form = CandyForm(request.form)
+    if request.method == 'POST' and form.validate():
+        candy = Candy(competitorname=form.competitorname.data, chocolate=form.chocolate.data, fruity=form.fruity.data, caramel=form.caramel.data, 
+                      peanutyalmondy=form.peanutyalmondy.data, nougat=form.nougat.data, crispedricewafer=form.crispedricewafer.data,
+                      hard=form.hard.data, bar=form.bar.data, pluribus=form.pluribus.data, sugarpercent=form.sugarpercent.data,
+                      pricepercent=form.pricepercent.data, winpercent=form.winpercent.data)
+        print(candy)
+        db.session.add(candy)
+        db.session.commit()
+        return redirect('/')
+    return render_template('candy_form.html', form=form)
 
 if __name__ == '__main__':
     app.debug = True

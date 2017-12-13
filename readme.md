@@ -47,6 +47,7 @@ MarkupSafe==1.0
 psycopg2==2.7.3.2
 SQLAlchemy==1.1.15
 Werkzeug==0.13
+WTForms==2.1
 ```
 Then install them:
 ```bash
@@ -63,6 +64,10 @@ app = Flask(__name__)
 @app.route('/') # The URL for the page we are creating
 def show_candies():
     return render_template('candy_list.html')
+
+if __name__ == '__main__':
+    app.debug = True
+    app.run()
 ```
 
 Let's also create the template:
@@ -191,9 +196,81 @@ Finally, let's add Dimple.js to our template to finalize our visualization.
     chart.draw()
 </script>          
 ```
+## Forms
+Finally, let's add a form so that we can add items to our database.
+```py
+from wtforms import Form, StringField, IntegerField, FloatField
+
+class CandyForm(Form):
+    competitorname = StringField('Name')
+    chocolate = IntegerField('chocolate')
+    fruity = IntegerField('fruity')
+    caramel = IntegerField('caramel')
+    peanutyalmondy = IntegerField('peanutyalmondy')
+    nougat = IntegerField('nougat')
+    crispedricewafer = IntegerField('crispedricewafer')
+    hard = IntegerField('hard')
+    bar = IntegerField('bar')
+    pluribus = IntegerField('pluribus')
+    sugarpercent = FloatField('sugar percent') 
+    pricepercent = FloatField('price percent')
+    winpercent = FloatField('win percent')
+
+
+@app.route('/create', methods=['GET', 'POST'])
+def create_candies():
+    form = CandyForm(request.form)
+    if request.method == 'POST' and form.validate():
+        candy = Candy(competitorname=form.competitorname.data, chocolate=form.chocolate.data, fruity=form.fruity.data, caramel=form.caramel.data, 
+                      peanutyalmondy=form.peanutyalmondy.data, nougat=form.nougat.data, crispedricewafer=form.crispedricewafer.data,
+                      hard=form.hard.data, bar=form.bar.data, pluribus=form.pluribus.data, sugarpercent=form.sugarpercent.data,
+                      pricepercent=form.pricepercent.data, winpercent=form.winpercent.data)
+        db.session.add(candy)
+        db.session.commit()
+        return redirect('/')
+    return render_template('candy_form.html', form=form)
+```
+
+```html
+{% macro render_field(field) %}
+<dt>{{ field.label }}
+<dd>{{ field(**kwargs)|safe }}
+{% if field.errors %}
+  <ul class=errors>
+  {% for error in field.errors %}
+    <li>{{ error }}</li>
+  {% endfor %}
+  </ul>
+{% endif %}
+</dd>
+{% endmacro %}
+
+<form method="post" action="/create">
+    <dl>
+      {{ render_field(form.competitorname) }}
+      {{ render_field(form.chocolate) }}
+      {{ render_field(form.fruity) }}
+      {{ render_field(form.caramel) }}
+      {{ render_field(form.peanutyalmondy) }}
+      {{ render_field(form.nougat) }}
+      {{ render_field(form.crispedricewafer) }}
+      {{ render_field(form.hard) }}
+      {{ render_field(form.bar) }}
+      {{ render_field(form.pluribus) }}
+      {{ render_field(form.sugarpercent) }}
+      {{ render_field(form.pricepercent) }}
+      {{ render_field(form.winpercent) }}
+    </dl>
+    <p><input type="submit" value="submit">
+</form>
+```
 
 ## Additional Resources
 * [Flask Documentation](http://flask.pocoo.org/docs/0.12/)
 * [Flask SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/queries/)
 * [Making a Flask app using a PostgreSQL database and deploying to Heroku](http://blog.sahildiwan.com/posts/flask-and-postgresql-app-deployed-on-heroku/)
 * [Deploy Machine Learning Models](https://www.analyticsvidhya.com/blog/2017/09/machine-learning-models-as-apis-using-flask/)
+* [Data Viz App](https://medium.com/@rchang/learning-how-to-build-a-web-application-c5499bd15c8f)
+* [Flowing Data](http://flowingdata.com/)
+* [D3](https://d3js.org/)
+* [Dimple](http://dimplejs.org/)

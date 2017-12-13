@@ -7,3 +7,4 @@ MarkupSafe==1.0
 psycopg2==2.7.3.2
 SQLAlchemy==1.1.15
 Werkzeug==0.13
+WTForms==2.1
