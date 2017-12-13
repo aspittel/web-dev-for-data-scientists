@@ -274,3 +274,4 @@ def create_candies():
 * [Flowing Data](http://flowingdata.com/)
 * [D3](https://d3js.org/)
 * [Dimple](http://dimplejs.org/)
+* [Deploy Python on Heroku](https://devcenter.heroku.com/articles/getting-started-with-python#introduction)
