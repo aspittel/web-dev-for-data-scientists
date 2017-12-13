@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Candy Ratings</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+          crossorigin="anonymous">
+</head>
+<body>
+    <div class="container text-center">
+        <h1>🍬🍫🍭Candy Ratings!🍭🍫🍬</h1>
+        <div id="chart-container"></div>
+        <table class="table table-hover">
+            <thead>
+                <th>Candy</th>
+                <th>Rating</th>
+            </thead>
+            <tbody>
+                {% for candy in candies %}
+                <tr>
+                    <td>{{ candy.competitorname }}</td>
+                    <td>{{ candy.winpercent }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.12.0/d3.js"></script>
+    <script src="http://dimplejs.org/dist/dimple.v2.3.0.min.js"></script>
+    <script>
+        let svg = dimple.newSvg("#chart-container", 1000, 500)
+        let chart = new dimple.chart(svg, {{ candy_json|tojson|safe }})
+        chart.setBounds(60, 30, 800, 300)
+        var x = chart.addCategoryAxis("x", "name")
+        chart.addMeasureAxis("y", "winpercent")
+        chart.addSeries(null, dimple.plot.bar)
+        chart.draw()
+    </script>          
+</body>
+</html>
